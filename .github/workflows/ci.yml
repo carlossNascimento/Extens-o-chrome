@@ -22,33 +22,34 @@ jobs:
         run: |
           npm ci || true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and start services
+      - name: Run API unit tests
         run: |
-          # Use Compose V2 (docker compose) which is available on the runner with Buildx
-          docker compose up -d --build
+          cd apps/api
+          npm ci
+          npm test
 
-      - name: Diagnostics - Docker / Compose (for debugging)
-        if: ${{ failure() }}
+      - name: Start API (background)
         run: |
-          echo '--- docker version ---'
-          docker --version || true
-          echo '--- docker info ---'
-          docker info || true
-          echo '--- docker compose version ---'
-          docker compose version || true
-          echo '--- docker compose config ---'
-          docker compose config || true
-          echo '--- build context listing (repo root) ---'
-          ls -la
-          echo '--- apps/api/Dockerfile ---'
-          sed -n '1,200p' apps/api/Dockerfile || true
-          echo '--- apps/web/Dockerfile ---'
-          sed -n '1,200p' apps/web/Dockerfile || true
-          echo '--- docker compose ps ---'
-          docker compose ps || true
+          cd apps/api
+          # start API in background and save pid
+          nohup npm start > ../../api.log 2>&1 &
+          echo $! > ../../api_pid
+          cd -
+
+      - name: Start web server (background)
+        run: |
+          # use npx http-server to serve static site on port 8080
+          npx http-server apps/web/public -p 8080 > web.log 2>&1 &
+          echo $! > web_pid
+
+      - name: Wait for API
+        run: |
+          for i in {1..30}; do if curl -sSf http://localhost:3000/health; then echo OK && break; fi; sleep 1; done
+
+      - name: Run basic smoke tests (curl)
+        run: |
+          curl -sfS http://localhost:8080/ || (tail -n +1 web.log && exit 1)
+          curl -sfS http://localhost:3000/api/hello || (tail -n +1 api.log && exit 1)
 
       - name: Wait for API
         run: |
@@ -73,4 +74,6 @@ jobs:
 
       - name: Tear down
         if: always()
-        run: docker compose down --volumes
+        run: |
+          if [ -f api_pid ]; then kill $(cat api_pid) || true; fi
+          if [ -f web_pid ]; then kill $(cat web_pid) || true; fi
