@@ -1,4 +1,10 @@
-const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
+// Use native global fetch when available (Node 18+), otherwise fall back to node-fetch
+const fetch = (...args) => {
+  if (typeof globalThis.fetch === 'function') {
+    return globalThis.fetch(...args);
+  }
+  return import('node-fetch').then(({ default: f }) => f(...args));
+};
 const { start, stop } = require('../index');
 
 beforeAll(async () => {
