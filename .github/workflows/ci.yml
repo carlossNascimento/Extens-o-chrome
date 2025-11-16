@@ -30,6 +30,26 @@ jobs:
           # Use Compose V2 (docker compose) which is available on the runner with Buildx
           docker compose up -d --build
 
+      - name: Diagnostics - Docker / Compose (for debugging)
+        if: ${{ failure() }}
+        run: |
+          echo '--- docker version ---'
+          docker --version || true
+          echo '--- docker info ---'
+          docker info || true
+          echo '--- docker compose version ---'
+          docker compose version || true
+          echo '--- docker compose config ---'
+          docker compose config || true
+          echo '--- build context listing (repo root) ---'
+          ls -la
+          echo '--- apps/api/Dockerfile ---'
+          sed -n '1,200p' apps/api/Dockerfile || true
+          echo '--- apps/web/Dockerfile ---'
+          sed -n '1,200p' apps/web/Dockerfile || true
+          echo '--- docker compose ps ---'
+          docker compose ps || true
+
       - name: Wait for API
         run: |
           for i in {1..20}; do if curl -sSf http://localhost:3000/health; then echo OK && break; fi; sleep 1; done
