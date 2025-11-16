@@ -25,7 +25,8 @@ jobs:
       - name: Run API unit tests
         run: |
           cd apps/api
-          npm ci
+          # prefer clean install (ci) when a lockfile exists, otherwise fall back to install
+          npm ci || npm install --no-audit --no-fund
           npm test
 
       - name: Start API (background)
