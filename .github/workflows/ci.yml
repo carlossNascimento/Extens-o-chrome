@@ -47,10 +47,17 @@ jobs:
         run: |
           for i in {1..30}; do if curl -sSf http://localhost:3000/health; then echo OK && break; fi; sleep 1; done
 
+      - name: Print recent service logs (for debugging)
+        run: |
+          echo '--- last 200 lines: api.log ---'
+          if [ -f api.log ]; then tail -n 200 api.log || true; else echo 'api.log not found'; fi
+          echo '--- last 200 lines: web.log ---'
+          if [ -f web.log ]; then tail -n 200 web.log || true; else echo 'web.log not found'; fi
+
       - name: Run basic smoke tests (curl)
         run: |
-          curl -sfS http://localhost:8080/ || (tail -n +1 web.log && exit 1)
-          curl -sfS http://localhost:3000/api/hello || (tail -n +1 api.log && exit 1)
+          curl -sfS http://localhost:8080/ || (echo 'web failed, dumping web.log'; tail -n +1 web.log || true; exit 1)
+          curl -sfS http://localhost:3000/api/hello || (echo 'api failed, dumping api.log'; tail -n +1 api.log || true; exit 1)
 
       - name: Wait for API
         run: |
