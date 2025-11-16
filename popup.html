@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello World Extension</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        min-width: 240px;
+        padding: 0;
+        margin: 0;
+        background: #f3f6fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 120px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 20px 24px;
+        text-align: center;
+        width: 100%;
+        max-width: 220px;
+        transition: box-shadow 0.2s;
+      }
+      .card:hover {
+        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      }
+      h1 {
+        font-size: 1.4em;
+        margin-bottom: 16px;
+        color: #2355a0;
+        letter-spacing: 1px;
+        transition: color 0.3s;
+      }
+      h1:hover {
+        color: #1565c0;
+      }
+      #clickMe {
+        background: linear-gradient(90deg, #1976d2, #43a047);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-size: 1em;
+        cursor: pointer;
+        box-shadow: 0 1px 6px rgba(33, 150, 243, 0.15);
+        transition: background 0.3s, transform 0.2s;
+      }
+      #clickMe:hover {
+        background: linear-gradient(90deg, #43a047, #1976d2);
+        transform: translateY(-2px) scale(1.04);
+      }
+      #feedback {
+        margin-top: 15px;
+        color: #1976d2;
+        font-size: 1em;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+      #feedback.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Hello, World!</h1>
+      <button id="clickMe">Click Me!</button>
+      <div id="feedback">You clicked the button! 🎉</div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

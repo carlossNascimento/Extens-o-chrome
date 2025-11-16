@@ -1,0 +1,19 @@
+{
+  "name": "hello-api",
+  "version": "1.0.0",
+  "description": "Simple API for Hello PWA",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --runInBand"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}

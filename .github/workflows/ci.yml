@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services: {}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install root dev deps
+        run: |
+          npm ci || true
+
+      - name: Build and start services
+        run: |
+          docker-compose up -d --build
+
+      - name: Wait for API
+        run: |
+          for i in {1..20}; do if curl -sSf http://localhost:3000/health; then echo OK && break; fi; sleep 1; done
+
+      - name: Run API unit tests
+        run: |
+          cd apps/api
+          npm ci
+          npm test
+
+      - name: Run basic smoke tests (curl)
+        run: |
+          curl -sfS http://localhost:8080/ || (docker-compose logs --no-color && exit 1)
+          curl -sfS http://localhost:3000/api/hello || (docker-compose logs --no-color && exit 1)
+
+      - name: Install Playwright and run E2E
+        run: |
+          npm i --no-audit --no-fund playwright@latest
+          npx playwright install --with-deps || true
+          npx playwright test tests/e2e --config=tests/e2e/playwright.config.js || true
+
+      - name: Tear down
+        if: always()
+        run: docker-compose down --volumes

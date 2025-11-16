@@ -1,0 +1,11 @@
+{
+  "name": "hello-pwa-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "e2e": "npx playwright test tests/e2e --config=tests/e2e/playwright.config.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.40.0"
+  }
+}
