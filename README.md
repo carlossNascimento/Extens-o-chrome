@@ -5,6 +5,8 @@ Instalação: Baixe o arquivo e abra o Chrome, após isso digite `chrome://exten
 
 Funções: Uma mensagem e um botão, que ao ser pressionado exibe um popup confirmando que o botão funciona.
 
+Carlos Augusto Sampaio do Nascimento
+
 License
 
 MIT License
